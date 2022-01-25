@@ -3,6 +3,7 @@ A small demo of ClearML modelling the titanic dataset using scikit-learn and Ker
 ## Setup
 
 To begin install the project requirements:
+
 **pip**
 ```bash
 pip install -r requirements.txt
