@@ -5,6 +5,7 @@ import keras
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from pathlib2 import Path
 import tensorflow as tf
 import tensorflow_addons as tfa
 import typer
@@ -225,7 +226,7 @@ def report_scalar(tracker: clearml.Task, key: str, value: float):
 def main(
     project_name: str = typer.Option("titanic-demo", help="Name of the project"),
     train_size: float = typer.Option(0.9, help="Size of the training set"),
-    epochs: int = typer.Option(100, help="Number of epochs"),
+    epochs: int = typer.Option(10, help="Number of epochs"),
     batch_size: int = typer.Option(32, help="Batch size"),
     n_layer: int = typer.Option(2, help="Number of layers"),
     n_units: int = typer.Option(32, help="Number of units"),
@@ -243,10 +244,17 @@ def main(
         }
     )
 
+    # log code
+    tracker.upload_artifact(name="code", artifact_object=Path("main.py"))
+
+    # get data
     df = get_dataset()
+
+    # split data
     train_df, test_df = split_data(df, train_size=train_size)
     make_plots(train_df, tracker)
 
+    # transform data
     transformer = get_transformer()
     transformer.fit(train_df)
     X_train = transformer.transform(train_df)
@@ -255,6 +263,7 @@ def main(
     X_train, y_train = X_train[:, :-1], X_train[:, -1].astype(np.int32)
     X_test, y_test = X_test[:, :-1], X_test[:, -1].astype(np.int32)
 
+    # train model
     model = get_model(
         n_features=X_train.shape[1],
         n_classes=len(np.unique(y_train)),
@@ -270,11 +279,14 @@ def main(
         validation_data=(X_test, y_test),
     )
 
+    # log model
+    tracker.upload_artifact(name="model", artifact_object=model)
+
+    # report metrics
     log_history(model.history, tracker)
 
     y_pred = model.predict(X_test)
 
-    # report metrics
     f1 = f1_score(y_test, y_pred.round())
     accuracy = accuracy_score(y_test, y_pred.round())
     precision = precision_score(y_test, y_pred.round())
