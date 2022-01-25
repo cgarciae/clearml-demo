@@ -15,6 +15,7 @@ poetry install
 poetry shell
 ```
 
+### ClearML
 To setup clearml, run the following command:
 
 ```bash
