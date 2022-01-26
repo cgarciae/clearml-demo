@@ -1,0 +1,17 @@
+name: clearml-demo
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python==3.8
+  - libclang=<12.0.0
+  - typer=0.4.0
+  - pandas=1.4.0
+  - scikit-learn=1.0.2
+  - datasets=1.18.0
+  - matplotlib=3.5.1
+  - seaborn=0.11.2
+  - pip:
+    - clearml
+    - tensorflow-cpu==2.7.0
+    - tensorflow-addons==0.15.0
